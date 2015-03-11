@@ -36,6 +36,7 @@ import javax.swing.SwingConstants;
 
 import utils.AwS3Conn;
 import utils.ConfigManager;
+import javax.swing.JCheckBox;
 
 public class MainGui extends JFrame {
 
@@ -44,6 +45,9 @@ public class MainGui extends JFrame {
 	private JTextField textField_3;
 	private static JTextArea txtrStatus;
 	private AwS3Conn awsS4 = null;
+	private CardLayout navLayout;
+	private JTextField textField;
+	private JTextField textField_1;
 
 	/**
 	 * Launch the application.
@@ -53,6 +57,7 @@ public class MainGui extends JFrame {
 			public void run() {
 				try {
 					MainGui frame = new MainGui();
+					frame.setSize(640, 480);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -77,12 +82,13 @@ public class MainGui extends JFrame {
 		txtrStatus = new JTextArea();
 		contentPane.add(txtrStatus, BorderLayout.SOUTH);
 		
-		JPanel navPanel = new JPanel();
+		final JPanel navPanel = new JPanel();
 		contentPane.add(navPanel, BorderLayout.WEST);
-		navPanel.setLayout(new CardLayout(0, 0));
+		navLayout = new CardLayout();
+		navPanel.setLayout(navLayout);
 		
 		JPanel accessPanel = new JPanel();
-		navPanel.add(accessPanel, "name_16056552804186");
+		navPanel.add(accessPanel, "accessPanel");
 		
 		JPanel s3Connect = new JPanel();
 		accessPanel.add(s3Connect);
@@ -98,9 +104,36 @@ public class MainGui extends JFrame {
 		
 		JPanel panel_1 = new JPanel();
 		s3Connect.add(panel_1);
+		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
+		
+		JPanel panel_2 = new JPanel();
+		panel_1.add(panel_2);
+		
+		JLabel lblNewLabel_1 = new JLabel("Access Key");
+		panel_2.add(lblNewLabel_1);
+		
+		textField = new JTextField();
+		panel_2.add(textField);
+		textField.setColumns(10);
+		
+		JPanel panel_9 = new JPanel();
+		panel_1.add(panel_9);
+		
+		JLabel lblSKey = new JLabel("Secret Key");
+		panel_9.add(lblSKey);
+		
+		textField_1 = new JTextField();
+		textField_1.setColumns(10);
+		panel_9.add(textField_1);
+		
+		JCheckBox chckbxNewCheckBox = new JCheckBox("Set As Default");
+		panel_1.add(chckbxNewCheckBox);
+		
+		JButton btnNewButton_6 = new JButton("Connect Using New Keys");
+		s3Connect.add(btnNewButton_6, BorderLayout.SOUTH);
 		
 		JPanel s4Panel = new JPanel();
-		navPanel.add(s4Panel, "name_16129026029748");
+		navPanel.add(s4Panel, "s4Panel");
 		s4Panel.setLayout(new BorderLayout(0, 0));
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -193,6 +226,9 @@ public class MainGui extends JFrame {
 				if(prop!=null){
 					awsS4 = new AwS3Conn(prop.getProperty("access-key"), prop.getProperty("secret-access-key"));
 					log("Connected to AWS S3");
+					if(awsS4!=null){
+						navLayout.show(navPanel, "s4Panel");
+					}
 				}
 				
 			}
