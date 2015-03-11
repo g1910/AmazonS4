@@ -27,6 +27,7 @@ import javax.swing.JList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,13 +36,28 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
-public class Test extends JFrame {
+import java.util.Properties;
+import java.awt.CardLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Component;
+
+import javax.swing.SwingConstants;
+
+import utils.AwS3Conn;
+import utils.ConfigManager;
+import javax.swing.JCheckBox;
+
+public class MainGui extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField textField_3;
+	private static JTextArea txtrStatus;
+	private AwS3Conn awsS4 = null;
+	private CardLayout navLayout;
+	private JTextField textField;
+	private JTextField textField_1;
 
 	/**
 	 * Launch the application.
@@ -50,7 +66,8 @@ public class Test extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Test frame = new Test();
+					MainGui frame = new MainGui();
+					frame.setSize(640, 480);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -62,7 +79,7 @@ public class Test extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Test() {
+	public MainGui() {
 		final JFrame frame = this;
 		setTitle("Amazon Secure Simple Storage Service (S4)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,89 +89,54 @@ public class Test extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
-		JPanel panel = new JPanel();
-		contentPane.add(panel, BorderLayout.NORTH);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		txtrStatus = new JTextArea();
+		contentPane.add(txtrStatus, BorderLayout.SOUTH);
+		
+		final JPanel navPanel = new JPanel();
+		contentPane.add(navPanel, BorderLayout.WEST);
+		navLayout = new CardLayout();
+		navPanel.setLayout(navLayout);
+		
+		JPanel accessPanel = new JPanel();
+		navPanel.add(accessPanel, "accessPanel");
+		
+		JPanel s3Connect = new JPanel();
+		accessPanel.add(s3Connect);
+		
+		JButton defaultConnBtn = new JButton("Connect Using Default Keys");
+		defaultConnBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		s3Connect.setLayout(new BorderLayout(0, 0));
+		
+		s3Connect.add(defaultConnBtn, BorderLayout.NORTH);
 		
 		JPanel panel_1 = new JPanel();
-		panel.add(panel_1);
-		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
-		
-		JLabel lblAws = new JLabel("AWS Access Key");
-		panel_1.add(lblAws);
-		
-		textField = new JTextField();
-		panel_1.add(textField);
-		textField.setColumns(10);
+		s3Connect.add(panel_1);
+		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
 		
 		JPanel panel_2 = new JPanel();
-		panel.add(panel_2);
-		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.X_AXIS));
+		panel_1.add(panel_2);
 		
-		JLabel label = new JLabel("AWS Secret Key");
-		panel_2.add(label);
+		JLabel lblNewLabel_1 = new JLabel("Access Key");
+		panel_2.add(lblNewLabel_1);
+		
+		textField = new JTextField();
+		panel_2.add(textField);
+		textField.setColumns(10);
+		
+		JPanel panel_9 = new JPanel();
+		panel_1.add(panel_9);
+		
+		JLabel lblSKey = new JLabel("Secret Key");
+		panel_9.add(lblSKey);
 		
 		textField_1 = new JTextField();
 		textField_1.setColumns(10);
-		panel_2.add(textField_1);
+		panel_9.add(textField_1);
 		
-		JPanel panel_3 = new JPanel();
-		panel.add(panel_3);
-		panel_3.setLayout(new BoxLayout(panel_3, BoxLayout.X_AXIS));
-		
-		JLabel lblBucketName = new JLabel("Bucket Name");
-		panel_3.add(lblBucketName);
-		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		panel_3.add(textField_2);
-		
-		JButton btnConnect = new JButton("Connect");
-		panel.add(btnConnect);
-		
-		JPanel panel_4 = new JPanel();
-		panel.add(panel_4);
-		panel_4.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
-		JButton btnNewButton = new JButton("Choose Existing Key Pair");
-		panel_4.add(btnNewButton);
-		
-		
-		
-		
-		JButton btnNewButton_1 = new JButton("Create New Key Pair");
-		panel_4.add(btnNewButton_1);
-		
-		
-		btnNewButton_1.addMouseListener(new MouseAdapter (){
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				JFileChooser newRsa_pubKey = new JFileChooser();
-				FileNameExtensionFilter pubkey_filter = new FileNameExtensionFilter(
-				        "Pubkey filter", "pubs4");
-				newRsa_pubKey.setFileFilter(pubkey_filter);
-				
-				JFileChooser newRsa_privKey = new JFileChooser();
-				FileNameExtensionFilter privkey_filter = new FileNameExtensionFilter(
-				        "Privkey filter", "privs4");
-				newRsa_privKey.setFileFilter(privkey_filter);
-				newRsa_pubKey.setDialogTitle("Enter the location to store the public key ");
-				newRsa_pubKey.showSaveDialog(frame);
-				newRsa_privKey.setDialogTitle("Enter the location to store the private key ");
-				newRsa_privKey.showSaveDialog(frame);
-				
-				try {
-					
-					generate_rsa_keys(newRsa_pubKey.getSelectedFile(),newRsa_privKey.getSelectedFile());
-				} catch (NoSuchAlgorithmException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
+
 		
 		
 		
@@ -168,9 +150,20 @@ public class Test extends JFrame {
 		
 		JTextArea txtrStatus = new JTextArea();
 		contentPane.add(txtrStatus, BorderLayout.SOUTH);
+
+		JCheckBox chckbxNewCheckBox = new JCheckBox("Set As Default");
+		panel_1.add(chckbxNewCheckBox);
+		
+		JButton btnNewButton_6 = new JButton("Connect Using New Keys");
+		s3Connect.add(btnNewButton_6, BorderLayout.SOUTH);
+		
+		JPanel s4Panel = new JPanel();
+		navPanel.add(s4Panel, "s4Panel");
+		s4Panel.setLayout(new BorderLayout(0, 0));
+
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		contentPane.add(tabbedPane, BorderLayout.CENTER);
+		s4Panel.add(tabbedPane);
 		
 		JPanel panel_5 = new JPanel();
 		tabbedPane.addTab("Upload", null, panel_5, null);
@@ -225,6 +218,83 @@ public class Test extends JFrame {
 		
 		JList list = new JList();
 		panel_6.add(list);
+		
+		JPanel panel = new JPanel();
+		s4Panel.add(panel, BorderLayout.NORTH);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		
+		JPanel panel_3 = new JPanel();
+		panel.add(panel_3);
+		panel_3.setLayout(new BoxLayout(panel_3, BoxLayout.X_AXIS));
+		
+		JLabel lblBucketName = new JLabel("Bucket Name");
+		panel_3.add(lblBucketName);
+		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
+		panel_3.add(textField_2);
+		
+		JPanel panel_4 = new JPanel();
+		panel_3.add(panel_4);
+		panel_4.setLayout(new BoxLayout(panel_4, BoxLayout.X_AXIS));
+		
+		JButton btnNewButton = new JButton("Choose Existing Key Pair");
+		panel_4.add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("Create New Key Pair");
+		panel_4.add(btnNewButton_1);
+		
+		btnNewButton_1.addMouseListener(new MouseAdapter (){
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JFileChooser newRsa_pubKey = new JFileChooser();
+				FileNameExtensionFilter pubkey_filter = new FileNameExtensionFilter(
+				        "Pubkey filter", "pubs4");
+				newRsa_pubKey.setFileFilter(pubkey_filter);
+				
+				JFileChooser newRsa_privKey = new JFileChooser();
+				FileNameExtensionFilter privkey_filter = new FileNameExtensionFilter(
+				        "Privkey filter", "privs4");
+				newRsa_privKey.setFileFilter(privkey_filter);
+				newRsa_pubKey.setDialogTitle("Enter the location to store the public key ");
+				newRsa_pubKey.showSaveDialog(frame);
+				newRsa_privKey.setDialogTitle("Enter the location to store the private key ");
+				newRsa_privKey.showSaveDialog(frame);
+				
+				try {
+					
+					generate_rsa_keys(newRsa_pubKey.getSelectedFile(),newRsa_privKey.getSelectedFile());
+				} catch (NoSuchAlgorithmException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		
+		
+		defaultConnBtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				log("Using Default Keys to connect to AWS S3");
+				Properties prop = ConfigManager.getProperties();
+				if(prop!=null){
+					awsS4 = new AwS3Conn(prop.getProperty("access-key"), prop.getProperty("secret-access-key"));
+					log("Connected to AWS S3");
+					if(awsS4!=null){
+						navLayout.show(navPanel, "s4Panel");
+					}
+				}
+				
+			}
+		});
+	}
+	
+	public static void log(String msg){
+		txtrStatus.append(msg+"\n");
 	}
 
 	protected void generate_rsa_keys(File pubFile,File privFile ) throws NoSuchAlgorithmException, IOException {
