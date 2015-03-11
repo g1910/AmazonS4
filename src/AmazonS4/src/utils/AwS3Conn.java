@@ -1,16 +1,16 @@
-package awsS3Manager;
+package utils;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 
-public class AS3Conn {
+public class AwS3Conn {
 	AWSCredentials credentials;
 	AmazonS3 s3client;
 	String currBucketName;
 	
-	public AS3Conn(String accessKey, String secretAccessKey){
+	public AwS3Conn(String accessKey, String secretAccessKey){
 		credentials = new BasicAWSCredentials(accessKey,secretAccessKey);
 		s3client = new AmazonS3Client(credentials);
 	}

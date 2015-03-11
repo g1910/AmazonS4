@@ -5,4 +5,4 @@
  * @author gaurav
  *
  */
-package awsS3Manager;
+package utils;
