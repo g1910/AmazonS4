@@ -27,13 +27,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-public class Test extends JFrame {
+public class MainGui extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField textField_3;
+	private JTextArea txtrStatus;
 
 	/**
 	 * Launch the application.
@@ -42,7 +41,7 @@ public class Test extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Test frame = new Test();
+					MainGui frame = new MainGui();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -54,7 +53,7 @@ public class Test extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Test() {
+	public MainGui() {
 		final JFrame frame = this;
 		setTitle("Amazon Secure Simple Storage Service (S4)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,27 +67,16 @@ public class Test extends JFrame {
 		contentPane.add(panel, BorderLayout.NORTH);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
-		JPanel panel_1 = new JPanel();
-		panel.add(panel_1);
-		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+		JPanel s3Connect = new JPanel();
+		panel.add(s3Connect);
+		s3Connect.setLayout(new BoxLayout(s3Connect, BoxLayout.X_AXIS));
 		
-		JLabel lblAws = new JLabel("AWS Access Key");
-		panel_1.add(lblAws);
+		JButton defaultConnBtn = new JButton("Connect Using Default Keys");
 		
-		textField = new JTextField();
-		panel_1.add(textField);
-		textField.setColumns(10);
+		s3Connect.add(defaultConnBtn);
 		
-		JPanel panel_2 = new JPanel();
-		panel.add(panel_2);
-		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.X_AXIS));
-		
-		JLabel label = new JLabel("AWS Secret Key");
-		panel_2.add(label);
-		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		panel_2.add(textField_1);
+		JButton newConnBtn = new JButton("Connect Using Existing Keys");
+		s3Connect.add(newConnBtn);
 		
 		JPanel panel_3 = new JPanel();
 		panel.add(panel_3);
@@ -114,7 +102,7 @@ public class Test extends JFrame {
 		JButton btnNewButton_1 = new JButton("Create New Key Pair");
 		panel_4.add(btnNewButton_1);
 		
-		JTextArea txtrStatus = new JTextArea();
+		txtrStatus = new JTextArea();
 		contentPane.add(txtrStatus, BorderLayout.SOUTH);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -173,5 +161,17 @@ public class Test extends JFrame {
 		
 		JList list = new JList();
 		panel_6.add(list);
+		
+		defaultConnBtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				log("Using Default Keys to connect to AWS S3");
+				
+			}
+		});
+	}
+	
+	public void log(String msg){
+		txtrStatus.append(msg+"\n");
 	}
 }
