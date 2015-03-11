@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JFileChooser;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
@@ -26,6 +27,13 @@ import javax.swing.JList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 
 public class Test extends JFrame {
 
@@ -111,8 +119,52 @@ public class Test extends JFrame {
 		JButton btnNewButton = new JButton("Choose Existing Key Pair");
 		panel_4.add(btnNewButton);
 		
+		
+		
+		
 		JButton btnNewButton_1 = new JButton("Create New Key Pair");
 		panel_4.add(btnNewButton_1);
+		
+		
+		btnNewButton_1.addMouseListener(new MouseAdapter (){
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JFileChooser newRsa_pubKey = new JFileChooser();
+				FileNameExtensionFilter pubkey_filter = new FileNameExtensionFilter(
+				        "Pubkey filter", "pubs4");
+				newRsa_pubKey.setFileFilter(pubkey_filter);
+				
+				JFileChooser newRsa_privKey = new JFileChooser();
+				FileNameExtensionFilter privkey_filter = new FileNameExtensionFilter(
+				        "Privkey filter", "privs4");
+				newRsa_privKey.setFileFilter(privkey_filter);
+				newRsa_pubKey.setDialogTitle("Enter the location to store the public key ");
+				newRsa_pubKey.showSaveDialog(frame);
+				newRsa_privKey.setDialogTitle("Enter the location to store the private key ");
+				newRsa_privKey.showSaveDialog(frame);
+				
+				try {
+					
+					generate_rsa_keys(newRsa_pubKey.getSelectedFile(),newRsa_privKey.getSelectedFile());
+				} catch (NoSuchAlgorithmException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		JTextArea txtrStatus = new JTextArea();
 		contentPane.add(txtrStatus, BorderLayout.SOUTH);
@@ -173,5 +225,54 @@ public class Test extends JFrame {
 		
 		JList list = new JList();
 		panel_6.add(list);
+	}
+
+	protected void generate_rsa_keys(File pubFile,File privFile ) throws NoSuchAlgorithmException, IOException {
+		// TODO Auto-generated method stub
+		System.out.println("Entered function:");
+		KeyPairGenerator rsaPair = KeyPairGenerator.getInstance("RSA");
+		rsaPair.initialize(2048);
+		KeyPair rP = rsaPair.genKeyPair();
+		
+		byte[] pubkey_bytes = rP.getPublic().getEncoded();
+		byte[] privkey_bytes = rP.getPrivate().getEncoded();
+		
+		String temp="";
+		String pubkey = "";
+		
+		System.out.println("Generating public key...");
+		float percent = (float) 0.00 ;
+		for (int i = 0; i < pubkey_bytes.length; i++) {
+			
+			temp = Integer.toString((pubkey_bytes[i] & 0xff) + 0x100, 16) ;
+			pubkey += temp.substring(1);
+			
+			percent = (float) (((float)i*100.00)/(float)pubkey_bytes.length) ;
+			System.out.println(percent);
+		}
+		
+		temp="";
+		String privkey = "";
+		System.out.println("Generating private key...");
+		percent=(float) 0.00;
+		for (int i = 0; i < privkey_bytes.length; i++) {
+			temp = Integer.toString((privkey_bytes[i] & 0xff) + 0x100, 16);
+			privkey += temp.substring(1);
+			
+			percent = (float) (((float)i*100.00)/(float)privkey_bytes.length) ;
+			System.out.println(percent);
+			
+		}
+		
+		//System.out.println(pubkey);
+		PrintWriter pub_key = new PrintWriter(new FileOutputStream(pubFile));
+		pub_key.println(pubkey);
+		pub_key.close();
+		
+		//System.out.println("Writing private key");
+		System.out.println(privkey);
+		PrintWriter priv_key = new PrintWriter(new FileOutputStream(privFile));
+		priv_key.println(privkey);
+		priv_key.close();
 	}
 }
