@@ -39,7 +39,7 @@ public class accessDialog extends JDialog {
 	public accessDialog() {
 		setTitle("Connect Using New Keys");
 		setBounds(100, 100, 450, 300);
-		getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		
 		JPanel panel = new JPanel();
 		getContentPane().add(panel);
