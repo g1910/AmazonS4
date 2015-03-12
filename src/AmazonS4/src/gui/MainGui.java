@@ -86,6 +86,7 @@ public class MainGui extends JFrame {
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
 	private KeyPair useKeys;
 	private SecretKey aes_key;
+	public File pub_file,priv_file ;
 
 	/**
 	 * Launch the application.
@@ -309,11 +310,20 @@ public class MainGui extends JFrame {
 				newRsa_privKey
 						.setDialogTitle("Enter the location to open the private key ");
 				newRsa_privKey.showOpenDialog(frame);
+				
+				if( !newRsa_pubKey.getSelectedFile().getName().toString().contains(".pubs4") )
+					pub_file = new File(newRsa_pubKey.getSelectedFile().getAbsolutePath()+".pubs4");
+				else
+					pub_file = newRsa_pubKey.getSelectedFile();
+				
+				if ( !newRsa_privKey.getSelectedFile().getName().toString().contains(".privs4") )
+					priv_file = new File(newRsa_privKey.getSelectedFile().getAbsolutePath()+".privs4");
+				else
+					priv_file = newRsa_privKey.getSelectedFile();
 
 				try {
 					useKeys = EncryptionManager.open_keys(
-							newRsa_pubKey.getSelectedFile(),
-							newRsa_privKey.getSelectedFile());
+							pub_file, priv_file);
 
 					// File temp = new File("/tmp/encrypt.temps4");
 					// encrypt(aes_key, useKeys);
@@ -355,16 +365,22 @@ public class MainGui extends JFrame {
 				newRsa_privKey
 						.setDialogTitle("Enter the location to store the private key ");
 				newRsa_privKey.showSaveDialog(frame);
+				
+				if( !newRsa_pubKey.getSelectedFile().getName().toString().contains(".pubs4") )
+					pub_file = new File(newRsa_pubKey.getSelectedFile().getAbsolutePath()+".pubs4");
+				else
+					pub_file = newRsa_pubKey.getSelectedFile();
+				
+				if ( !newRsa_privKey.getSelectedFile().getName().toString().contains(".privs4") )
+					priv_file = new File(newRsa_privKey.getSelectedFile().getAbsolutePath()+".privs4");
+				else
+					priv_file = newRsa_privKey.getSelectedFile();
 
 				try {
 
-					EncryptionManager.generate_rsa_keys(
-							newRsa_pubKey.getSelectedFile(),
-							newRsa_privKey.getSelectedFile());
+					EncryptionManager.generate_rsa_keys(pub_file, priv_file);
 
-					useKeys = EncryptionManager.open_keys(
-							newRsa_pubKey.getSelectedFile(),
-							newRsa_privKey.getSelectedFile());
+					useKeys = EncryptionManager.open_keys(pub_file, priv_file);
 
 				} catch (NoSuchAlgorithmException e1) {
 					// TODO Auto-generated catch block
