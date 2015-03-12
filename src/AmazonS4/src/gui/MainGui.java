@@ -67,6 +67,7 @@ import com.amazonaws.services.s3.transfer.Upload;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.JRadioButton;
+import javax.swing.JProgressBar;
 
 public class MainGui extends JFrame {
 
@@ -86,7 +87,14 @@ public class MainGui extends JFrame {
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
 	private KeyPair useKeys;
 	private SecretKey aes_key;
-	public File pub_file,priv_file ;
+	public File pub_file, priv_file;
+	private boolean upF;
+	private static JProgressBar progressBar;
+	private static JLabel progressStatus;
+	private static JLabel encdecStatus;
+	private static JProgressBar encdecBar;
+	private int countFiles = 0;
+	private int countDFiles = 0;
 
 	/**
 	 * Launch the application.
@@ -176,6 +184,24 @@ public class MainGui extends JFrame {
 		navPanel.add(s4Panel, "s4Panel");
 		s4Panel.setLayout(new BorderLayout(0, 0));
 
+		JPanel panel_6 = new JPanel();
+		s4Panel.add(panel_6, BorderLayout.SOUTH);
+		panel_6.setLayout(new BoxLayout(panel_6, BoxLayout.Y_AXIS));
+
+		progressStatus = new JLabel("");
+		panel_6.add(progressStatus);
+
+		progressBar = new JProgressBar();
+		progressBar.setStringPainted(true);
+		panel_6.add(progressBar);
+
+		encdecStatus = new JLabel("");
+		panel_6.add(encdecStatus);
+
+		encdecBar = new JProgressBar();
+		encdecBar.setStringPainted(true);
+		panel_6.add(encdecBar);
+
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		s4Panel.add(tabbedPane);
 
@@ -201,7 +227,7 @@ public class MainGui extends JFrame {
 		uploadPanel.add(panel_5);
 		panel_5.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JRadioButton dirSelectRadio = new JRadioButton("");
+		final JRadioButton dirSelectRadio = new JRadioButton("");
 		panel_5.add(dirSelectRadio);
 
 		ButtonGroup group = new ButtonGroup();
@@ -219,7 +245,8 @@ public class MainGui extends JFrame {
 		uploadPanel.add(panel_3);
 		panel_3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JLabel lblNewLabel_2 = new JLabel("Key/Virtual Key Directory");
+		JLabel lblNewLabel_2 = new JLabel(
+				"Key/Virtual Key Directory(Empty For Same Name)");
 		panel_3.add(lblNewLabel_2);
 
 		keyField = new JTextField();
@@ -310,20 +337,23 @@ public class MainGui extends JFrame {
 				newRsa_privKey
 						.setDialogTitle("Enter the location to open the private key ");
 				newRsa_privKey.showOpenDialog(frame);
-				
-				if( !newRsa_pubKey.getSelectedFile().getName().toString().contains(".pubs4") )
-					pub_file = new File(newRsa_pubKey.getSelectedFile().getAbsolutePath()+".pubs4");
+
+				if (!newRsa_pubKey.getSelectedFile().getName().toString()
+						.contains(".pubs4"))
+					pub_file = new File(newRsa_pubKey.getSelectedFile()
+							.getAbsolutePath() + ".pubs4");
 				else
 					pub_file = newRsa_pubKey.getSelectedFile();
-				
-				if ( !newRsa_privKey.getSelectedFile().getName().toString().contains(".privs4") )
-					priv_file = new File(newRsa_privKey.getSelectedFile().getAbsolutePath()+".privs4");
+
+				if (!newRsa_privKey.getSelectedFile().getName().toString()
+						.contains(".privs4"))
+					priv_file = new File(newRsa_privKey.getSelectedFile()
+							.getAbsolutePath() + ".privs4");
 				else
 					priv_file = newRsa_privKey.getSelectedFile();
 
 				try {
-					useKeys = EncryptionManager.open_keys(
-							pub_file, priv_file);
+					useKeys = EncryptionManager.open_keys(pub_file, priv_file);
 
 					// File temp = new File("/tmp/encrypt.temps4");
 					// encrypt(aes_key, useKeys);
@@ -333,15 +363,19 @@ public class MainGui extends JFrame {
 
 				} catch (NoSuchAlgorithmException e1) {
 					// TODO Auto-generated catch block
+					MainGui.log("Error! Choose Again");
 					e1.printStackTrace();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
+					MainGui.log("Error! Choose Again");
 					e1.printStackTrace();
 				} catch (InvalidKeySpecException e1) {
 					// TODO Auto-generated catch block
+					MainGui.log("Error! Choose Again");
 					e1.printStackTrace();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
+					MainGui.log("Error! Choose Again");
 					e1.printStackTrace();
 				}
 			}
@@ -365,14 +399,18 @@ public class MainGui extends JFrame {
 				newRsa_privKey
 						.setDialogTitle("Enter the location to store the private key ");
 				newRsa_privKey.showSaveDialog(frame);
-				
-				if( !newRsa_pubKey.getSelectedFile().getName().toString().contains(".pubs4") )
-					pub_file = new File(newRsa_pubKey.getSelectedFile().getAbsolutePath()+".pubs4");
+
+				if (!newRsa_pubKey.getSelectedFile().getName().toString()
+						.contains(".pubs4"))
+					pub_file = new File(newRsa_pubKey.getSelectedFile()
+							.getAbsolutePath() + ".pubs4");
 				else
 					pub_file = newRsa_pubKey.getSelectedFile();
-				
-				if ( !newRsa_privKey.getSelectedFile().getName().toString().contains(".privs4") )
-					priv_file = new File(newRsa_privKey.getSelectedFile().getAbsolutePath()+".privs4");
+
+				if (!newRsa_privKey.getSelectedFile().getName().toString()
+						.contains(".privs4"))
+					priv_file = new File(newRsa_privKey.getSelectedFile()
+							.getAbsolutePath() + ".privs4");
 				else
 					priv_file = newRsa_privKey.getSelectedFile();
 
@@ -384,12 +422,15 @@ public class MainGui extends JFrame {
 
 				} catch (NoSuchAlgorithmException e1) {
 					// TODO Auto-generated catch block
+					MainGui.log("Error! Choose Again");
 					e1.printStackTrace();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
+					MainGui.log("Error! Choose Again");
 					e1.printStackTrace();
 				} catch (InvalidKeySpecException e1) {
 					// TODO Auto-generated catch block
+					MainGui.log("Error! Choose Again");
 					e1.printStackTrace();
 				}
 			}
@@ -401,13 +442,19 @@ public class MainGui extends JFrame {
 				log("Using Default Keys to connect to AWS S3");
 				Properties prop = ConfigManager.getProperties();
 				if (prop != null) {
-					awsS4 = new AwS3Conn(prop.getProperty("access-key"), prop
-							.getProperty("secret-access-key"));
+					if (prop.getProperty("access-key").isEmpty()
+							|| prop.getProperty("secret-access-key").isEmpty()) {
+						MainGui.log("Sorry, unable to find access keys\nTry connecting using new Access Keys");
 
-					if (awsS4 != null) {
-						log("Connected to AWS S3");
-						navLayout.show(navPanel, "s4Panel");
-						s3 = awsS4.getS3client();
+					} else {
+						awsS4 = new AwS3Conn(prop.getProperty("access-key"),
+								prop.getProperty("secret-access-key"));
+
+						if (awsS4 != null) {
+							log("Connected to AWS S3");
+							navLayout.show(navPanel, "s4Panel");
+							s3 = awsS4.getS3client();
+						}
 					}
 				}
 
@@ -428,12 +475,12 @@ public class MainGui extends JFrame {
 					s3 = awsS4.getS3client();
 				}
 				if (setDefault.isSelected()) {
-					Properties prop = ConfigManager.getProperties();
-					if (prop != null) {
-						prop.setProperty("access-key", accKey);
-						prop.setProperty("secret-access-key", secKey);
-						log("Access Keys changed!");
-					}
+					Properties prop = new Properties();
+					prop.setProperty("access-key", accKey);
+					prop.setProperty("secret-access-key", secKey);
+					ConfigManager.setProperties(prop);
+					log("Access Keys changed!");
+
 				}
 			}
 		});
@@ -496,24 +543,46 @@ public class MainGui extends JFrame {
 		uploadBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				MainGui.log("Starting Upload...");
-				if (fileSelectRadio.isSelected()) {
-					uploadSingleFile(keyField.getText(),uFile);
-				}else{
-					
-					uploadDir(keyField.getText(),uFile);
+				if (awsS4.getBucket().isEmpty()
+						|| !awsS4.getS3client().doesBucketExist(
+								awsS4.getBucket())) {
+					MainGui.log("Cannot Proceed! Valid Bucket not selected/created");
+				} else if (useKeys == null) {
+					MainGui.log("Cannot Proceed! RSA Key Pair not selected");
+				} else if (!fileSelectRadio.isSelected()
+						&& !dirSelectRadio.isSelected()) {
+					MainGui.log("Cannot Proceed! No upload option selected selected");
+				} else if (uFile == null) {
+					MainGui.log("Cannot Proceed! No upload file/directory selected selected");
+				} else {
+					MainGui.log("Starting Upload...");
+					MainGui.progress("", 0);
+					MainGui.encDec("", 0);
+					String key = keyField.getText();
+					if (key.isEmpty()) {
+						key = uFile.getName();
+					}
+					if (fileSelectRadio.isSelected()) {
+						countFiles++;
+						uploadSingleFile(key, uFile);
+						upF = true;
+					} else {
+						countFiles += countFile(uFile);
+						uploadDir(key, uFile);
+						upF = false;
+					}
+
+					/*
+					 * try { // You can block and wait for the upload to finish
+					 * upload.waitForCompletion(); } catch
+					 * (AmazonClientException amazonClientException) {
+					 * System.out
+					 * .println("Unable to upload file, upload aborted.");
+					 * amazonClientException.printStackTrace(); } catch
+					 * (InterruptedException e1) { // TODO Auto-generated catch
+					 * block e1.printStackTrace(); }
+					 */
 				}
-
-				/*
-				 * try { // You can block and wait for the upload to finish
-				 * upload.waitForCompletion(); } catch (AmazonClientException
-				 * amazonClientException) {
-				 * System.out.println("Unable to upload file, upload aborted.");
-				 * amazonClientException.printStackTrace(); } catch
-				 * (InterruptedException e1) { // TODO Auto-generated catch
-				 * block e1.printStackTrace(); }
-				 */
-
 			}
 		});
 
@@ -521,7 +590,13 @@ public class MainGui extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String keyTemp = keyList.getSelectedValue();
-				if (keyTemp == null) {
+				if (awsS4.getBucket().isEmpty()
+						|| !awsS4.getS3client().doesBucketExist(
+								awsS4.getBucket())) {
+					MainGui.log("Cannot Proceed! Valid Bucket not selected/created");
+				} else if (useKeys == null) {
+					MainGui.log("Cannot Proceed! RSA Key Pair not selected");
+				} else if (keyTemp == null) {
 					MainGui.log("No selected object to download\nPlease select an object to download!");
 				} else {
 					final String key = keyTemp.split(" ")[2];
@@ -534,6 +609,8 @@ public class MainGui extends JFrame {
 					final File dFile = new File("temp");
 
 					MainGui.log("Starting to download " + key);
+					MainGui.progress("", 0);
+					MainGui.encDec("", 0);
 					new Thread(new Runnable() {
 
 						@Override
@@ -543,7 +620,7 @@ public class MainGui extends JFrame {
 									.getCredentials());
 
 							try {
-
+								countDFiles++;
 								final Download download = tx.download(
 										awsS4.getBucket(), key, dFile);
 
@@ -553,13 +630,26 @@ public class MainGui extends JFrame {
 									public void progressChanged(
 											ProgressEvent progressEvent) {
 										// TODO Auto-generated method stub
-										System.out.println(download
-												.getProgress()
-												.getPercentTransferred()
+										System.out
+												.println("Downloading "
+														+ key
+														+ " ... "
+														+ download
+																.getProgress()
+																.getPercentTransferred()
+														+ "%");
+										MainGui.log("Downloading "
+												+ key
+												+ " ... "
+												+ download
+														.getProgress()
+														.getPercentTransferred()
 												+ "%");
-										MainGui.log(download.getProgress()
-												.getPercentTransferred() + "%");
+										int val = (int) download.getProgress()
+												.getPercentTransferred();
 
+										MainGui.progress("Downloading " + key
+												+ " ... " + val + "%", val);
 									}
 
 								});
@@ -570,8 +660,23 @@ public class MainGui extends JFrame {
 									public void run() {
 										// TODO Auto-generated method stub
 										try {
+											System.out.println("Hi");
 											download.waitForCompletion();
-											MainGui.log("Download Completed\nDecrypting...");
+											System.out.println("Hello");
+											MainGui.log("Downloading "
+													+ key
+													+ " complete!\nDecrypting...");
+											MainGui.progress(
+													"Downloading "
+															+ key
+															+ " complete! Decrypting...",
+													100);
+											countDFiles--;
+											if (countDFiles == 0) {
+												MainGui.progress(
+														"Download complete!",
+														100);
+											}
 											EncryptionManager.decrypt(useKeys,
 													dFile, downloadDialog
 															.getSelectedFile());
@@ -603,22 +708,22 @@ public class MainGui extends JFrame {
 			}
 		});
 	}
-	
-	public void createFolder(String folderName){
+
+	public void createFolder(String folderName) {
 		// create meta-data for your folder and set content-length to 0
 		ObjectMetadata metadata = new ObjectMetadata();
 		metadata.setContentLength(0);
 		// create empty content
 		InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
 		// create a PutObjectRequest passing the folder name suffixed by /
-		PutObjectRequest putObjectRequest = new PutObjectRequest(awsS4.getBucket(),
-					folderName + "/", emptyContent, metadata);
+		PutObjectRequest putObjectRequest = new PutObjectRequest(
+				awsS4.getBucket(), folderName + "/", emptyContent, metadata);
 		// send request to S3 to create folder
 		awsS4.getS3client().putObject(putObjectRequest);
 	}
 
-	public void uploadSingleFile(final String key,final File f) {
-		MainGui.log("Uploading "+f.getName());
+	public void uploadSingleFile(final String key, final File f) {
+		MainGui.log("Uploading " + f.getName());
 		new Thread(new Runnable() {
 
 			@Override
@@ -641,47 +746,67 @@ public class MainGui extends JFrame {
 					keygen = KeyGenerator.getInstance("AES");
 					keygen.init(128);
 					aes_key = keygen.generateKey();
-					File enc_File = EncryptionManager.encrypt(useKeys, aes_key,
-							f);
-					final Upload upload = tx.upload(awsS4.getBucket(),
-							key, enc_File);
+					final File enc_File = EncryptionManager.encrypt(useKeys,
+							aes_key, f);
+					final Upload upload = tx.upload(awsS4.getBucket(), key,
+							enc_File);
 
 					upload.addProgressListener(new ProgressListener() {
 
 						@Override
 						public void progressChanged(ProgressEvent progressEvent) {
 							// TODO Auto-generated method stub
-							System.out.println(upload.getProgress()
-									.getPercentTransferred() + "%");
-							MainGui.log(upload.getProgress()
-									.getPercentTransferred() + "%");
+							System.out.println("Uploading "
+									+ f.getName()
+									+ " in Progress... "
+									+ upload.getProgress()
+											.getPercentTransferred() + "%");
+							MainGui.log("Uploading "
+									+ f.getName()
+									+ " in Progress... "
+									+ upload.getProgress()
+											.getPercentTransferred() + "%");
 
-						}
-
-					});
-
-					new Thread(new Runnable() {
-
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							try {
-								upload.waitForCompletion();
+							int val = (int) upload.getProgress()
+									.getPercentTransferred();
+							MainGui.progress("Uploading " + f.getName()
+									+ " in Progress... " + val + "%", val);
+							if (val == 100) {
 								objListing = awsS4.getObjectListing("");
 								upDateList();
-							} catch (AmazonServiceException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (AmazonClientException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
 							}
+
 						}
 
 					});
+
+					upload.waitForCompletion();
+					enc_File.delete();
+					MainGui.log("Uploading " + key + " complete!");
+					MainGui.progress("Uploading " + key + " complete!", 100);
+					countFiles--;
+					if (countFiles == 0) {
+						MainGui.progress("Upload complete!", 100);
+					}
+					objListing = awsS4.getObjectListing("");
+					upDateList();
+
+					/*
+					 * new Thread(new Runnable() {
+					 * 
+					 * @Override public void run() { // TODO Auto-generated
+					 * method stub try {
+					 * 
+					 * 
+					 * } catch (AmazonServiceException e) { // TODO
+					 * Auto-generated catch block e.printStackTrace(); } catch
+					 * (AmazonClientException e) { // TODO Auto-generated catch
+					 * block e.printStackTrace(); } catch (InterruptedException
+					 * e) { // TODO Auto-generated catch block
+					 * e.printStackTrace(); } }
+					 * 
+					 * }).start();;
+					 */
 				} catch (NoSuchAlgorithmException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -694,19 +819,41 @@ public class MainGui extends JFrame {
 
 		}).start();
 	}
-	
-	public void uploadDir(String key,File f){
-		for(File a : f.listFiles()){
-			if(a.isDirectory()){
-				uploadDir(key+"/"+a.getName(),a);
-			}else{
-				uploadSingleFile(key + "/"+ a.getName(),a);
+
+	public int countFile(File f) {
+		int count = 0;
+		for (File a : f.listFiles()) {
+			if (a.isDirectory()) {
+				count += countFile(a);
+			} else {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	public void uploadDir(String key, File f) {
+		for (File a : f.listFiles()) {
+			if (a.isDirectory()) {
+				uploadDir(key + "/" + a.getName(), a);
+			} else {
+				uploadSingleFile(key + "/" + a.getName(), a);
 			}
 		}
 	}
 
 	public static void log(String msg) {
 		txtrStatus.append(msg + "\n");
+	}
+
+	public static void progress(String msg, int val) {
+		progressBar.setValue(val);
+		progressStatus.setText(msg);
+	}
+
+	public static void encDec(String msg, int val) {
+		encdecBar.setValue(val);
+		encdecStatus.setText(msg);
 	}
 
 	public void upDateList() {
@@ -718,5 +865,4 @@ public class MainGui extends JFrame {
 					+ " )");
 		}
 	}
-
 }
