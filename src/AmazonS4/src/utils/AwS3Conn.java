@@ -14,7 +14,7 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 public class AwS3Conn {
 	AWSCredentials credentials;
 	AmazonS3 s3client;
-	String currBucketName;
+	String currBucketName = "";
 	ObjectListing objListing;
 
 	public AwS3Conn(String accessKey, String secretAccessKey) {

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.KeyFactory;
@@ -160,7 +161,7 @@ public class EncryptionManager {
 		
 		long size = f.length();
 		long curr = 0;
-
+		Float d;
 		FileOutputStream encFile = new FileOutputStream(enc_File);
 
 		Cipher rsa = Cipher.getInstance("RSA");
@@ -181,7 +182,10 @@ public class EncryptionManager {
 			if (output != null) {
 				encFile.write(output);
 				curr += 64;
-				MainGui.log("Encryption in progress : " + (double)(curr*100/size) + "%");
+				curr=curr<size?curr:size;
+				d = (float) ((curr*100.0)/size);
+				MainGui.log("Encryption of file "+f.getName()+ " in progress : " + d + "%");
+				MainGui.encDec("Encryption of file "+f.getName()+ " in progress... "+Math.round(d)+"%", Math.round(d));
 			}
 		}
 
@@ -189,8 +193,8 @@ public class EncryptionManager {
 		if (output != null) {
 			encFile.write(output);
 		}
-		MainGui.log("Encryption complete!");
-
+		MainGui.log("Encryption complete!\nUploading...");
+		MainGui.encDec("Encryption complete!",100);
 		rawFile.close();
 		encFile.flush();
 		encFile.close();
@@ -204,6 +208,10 @@ public class EncryptionManager {
 
 		FileInputStream encFile = new FileInputStream(temp);
 
+		long size = temp.length();
+		long curr = 0;
+
+		Float d;
 		Cipher rsa = Cipher.getInstance("RSA");
 		rsa.init(Cipher.DECRYPT_MODE, rP.getPrivate());
 		byte[] encKey = new byte[256];
@@ -219,8 +227,14 @@ public class EncryptionManager {
 		int read;
 		while ((read = encFile.read(in)) != -1) {
 			byte[] output = cipher.update(in, 0, read);
-			if (output != null)
+			if (output != null){
 				decFile.write(output);
+				curr += 64;
+				curr=curr<size?curr:size;
+				d = (float)(curr*100.0)/size;
+				MainGui.log("Decryption of file "+dest.getName()+ " in progress : " + (double)(curr*100/size) + "%");
+				MainGui.encDec("Decryption of file "+dest.getName()+ " in progress... "+Math.round(d)+"%", Math.round(d));
+			}
 		}
 
 		byte[] output = cipher.doFinal();
@@ -228,8 +242,10 @@ public class EncryptionManager {
 			decFile.write(output);
 		
 		MainGui.log("Decryption Complete!");
+		MainGui.encDec("Decryption Complete!",100);
 
 		encFile.close();
+		temp.delete();
 		decFile.flush();
 		decFile.close();
 		

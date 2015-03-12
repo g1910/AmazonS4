@@ -2,8 +2,10 @@ package utils;
 
 import gui.MainGui;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 public class ConfigManager {
@@ -38,5 +40,19 @@ public class ConfigManager {
 
 		}
 		return null;
+	}
+	
+	public static void setProperties(Properties prop){
+		try {
+			OutputStream output=new FileOutputStream("./src/config.properties");
+			prop.store(output, null);
+			if(output!=null){
+				output.flush();
+				output.close();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
