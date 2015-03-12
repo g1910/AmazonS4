@@ -51,7 +51,7 @@ public class AwS3Conn {
 			createBucket(name);
 			MainGui.log("Created bucket " + name);
 		}
-		MainGui.log("Setting bucket to "+name);
+		MainGui.log("Current Bucket set to "+name + "!");
 		currBucketName = name;
 	}
 	
@@ -68,11 +68,24 @@ public class AwS3Conn {
             for (S3ObjectSummary objectSummary : 
             	objListing.getObjectSummaries()) {
                 System.out.println(" - " + objectSummary.getKey() + "  " +
-                        "(size = " + objectSummary.getSize() + 
-                        ")");
+                        "(size = " + findSize(objectSummary.getSize()) + 
+                        " )");
             }
             listObjectsRequest.setMarker(objListing.getNextMarker());
         } while (objListing.isTruncated());
 		return objListing;
+	}
+
+	public static String findSize(long size) {
+		// TODO Auto-generated method stub
+		if(size<1024){
+			return size + " bytes";
+		}else if(size<1024*1024){
+			return size*1.0/1024 + "KB";
+		}else if(size<1024*1024*1024){
+			return size*1.0/(1024*1024) + " MB";
+		}else if(size<1024*1024*1024*1024){
+			return size*1.0/(1024*1024*1024) + " GB";
+		}else return size + "";
 	}
 }
