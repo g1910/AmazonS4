@@ -11,6 +11,9 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.TransferManager;
 
+/*
+ * This class helps in managing the AWS connections
+ */
 public class AwS3Conn {
 	AWSCredentials credentials;
 	AmazonS3 s3client;

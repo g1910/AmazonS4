@@ -23,8 +23,12 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+/*
+ * This class provides utilities related to encryption/decryption and key generation and encoding
+ */
 public class EncryptionManager {
 
+	//Function to generate RSA keys from file
 	public static KeyPair open_keys(File pub, File priv) throws IOException,
 			NoSuchAlgorithmException, InvalidKeySpecException {
 
@@ -60,6 +64,7 @@ public class EncryptionManager {
 		return keypair;
 	}
 	
+	//Function to put RSA keys to a file
 	public static void generate_rsa_keys(File pubFile,File privFile ) throws NoSuchAlgorithmException, IOException {
 		// TODO Auto-generated method stub
 		System.out.println("Entered function:");
@@ -153,6 +158,7 @@ public class EncryptionManager {
 		priv_key.close();*/
 	}
 	
+	//Function to encrypt data with RSA and AES
 	public static File encrypt(KeyPair rP,SecretKey key,File f) throws Exception {
 		// TODO Auto-generated method stub
 		FileInputStream rawFile = new FileInputStream(f);
@@ -202,6 +208,7 @@ public class EncryptionManager {
 		return enc_File;
 	}
 	
+	//Function to decrypt data using RSA and AES
 	public static void decrypt(KeyPair rP, File temp,File dest) throws Exception {
 		// TODO Auto-generated method stub
 		FileOutputStream decFile = new FileOutputStream(dest);

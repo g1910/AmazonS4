@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+/*
+ * This class helps in getting and setting the configuration settings in the config.properties
+ */
 public class ConfigManager {
 	public static Properties getProperties(){
 		Properties prop = new Properties();

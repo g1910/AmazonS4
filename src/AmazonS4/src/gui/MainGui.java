@@ -69,8 +69,15 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JRadioButton;
 import javax.swing.JProgressBar;
 
+/*
+ * MainGui run the GUI for Amazon S4 which provide the functionality
+ * to encrypt data using RSA and AES encryption before uploading it to the server
+ */
+
 public class MainGui extends JFrame {
 
+//various private and static attribute to communicate b/w
+//various functions and inner classes
 	private JPanel contentPane;
 	private JTextField prefix;
 	private static JTextArea txtrStatus;
@@ -117,6 +124,9 @@ public class MainGui extends JFrame {
 	 * Create the frame.
 	 */
 	public MainGui() {
+		/*
+		 * Following is the code to build the GUI components of the application
+		 */
 		final JFrame frame = this;
 		setTitle("Amazon Secure Simple Storage Service (S4)");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -318,7 +328,17 @@ public class MainGui extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(txtrStatus);
 
 		contentPane.add(scrollPane, BorderLayout.SOUTH);
+		
+		/*
+		 * Following code defines the various mouse click listener functions
+		 * for the various buttons in the GUI
+		 */
 
+		/*
+		 * This listener enables to open RSA public and private key files
+		 * to be used for encrypting the files before uploading and
+		 * decrypting the file after downloading
+		 */
 		existingBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -381,6 +401,10 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function help in creating and saving a new pair
+		 * of RSA encryption keys to use
+		 */
 		newBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -416,6 +440,7 @@ public class MainGui extends JFrame {
 
 				try {
 
+					//Generating key pair for RSA to use in current session
 					EncryptionManager.generate_rsa_keys(pub_file, priv_file);
 
 					useKeys = EncryptionManager.open_keys(pub_file, priv_file);
@@ -436,6 +461,10 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function helps in access AWS using default
+		 * access keys stored in the configuration file
+		 */
 		defaultConnBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -461,6 +490,10 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function allows entering and saving new access
+		 * key to access AWS
+		 */
 		newConnBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -485,6 +518,10 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function allows selecting the bucket container
+		 * where you want to upload or download files
+		 */
 		bucketSelectBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -497,6 +534,10 @@ public class MainGui extends JFrame {
 
 		});
 
+		/*
+		 * This listener function allows searching for keys in the bucket
+		 * based on a specific prefix
+		 */
 		searchBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -505,6 +546,9 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function allows selecting a file for upload
+		 */
 		fileSelectBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -523,6 +567,9 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function allows a complete directory for upload
+		 */
 		dirSelectBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -540,6 +587,9 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function allows us to upload file/directory after encrypting the data
+		 */
 		uploadBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -586,6 +636,9 @@ public class MainGui extends JFrame {
 			}
 		});
 
+		/*
+		 * This listener function allows downloading file, decrypting it and saving on the local machine
+		 */
 		downloadBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -709,6 +762,9 @@ public class MainGui extends JFrame {
 		});
 	}
 
+	/*
+	 * This function creates an empty folder in the bucket
+	 */
 	public void createFolder(String folderName) {
 		// create meta-data for your folder and set content-length to 0
 		ObjectMetadata metadata = new ObjectMetadata();
@@ -722,6 +778,9 @@ public class MainGui extends JFrame {
 		awsS4.getS3client().putObject(putObjectRequest);
 	}
 
+	/*
+	 * This function uploads a single file to the s3 bucket
+	 */
 	public void uploadSingleFile(final String key, final File f) {
 		MainGui.log("Uploading " + f.getName());
 		new Thread(new Runnable() {
@@ -820,6 +879,9 @@ public class MainGui extends JFrame {
 		}).start();
 	}
 
+	/*
+	 * This function counts the files in a directory
+	 */
 	public int countFile(File f) {
 		int count = 0;
 		for (File a : f.listFiles()) {
@@ -832,6 +894,9 @@ public class MainGui extends JFrame {
 		return count;
 	}
 
+	/*
+	 * This function uploads a directory recursively
+	 */
 	public void uploadDir(String key, File f) {
 		for (File a : f.listFiles()) {
 			if (a.isDirectory()) {
@@ -842,20 +907,32 @@ public class MainGui extends JFrame {
 		}
 	}
 
+	/*
+	 * This function helps in displaying log message in the GUI
+	 */
 	public static void log(String msg) {
 		txtrStatus.append(msg + "\n");
 	}
 
+	/*
+	 * This function controls the progress of upload and download
+	 */
 	public static void progress(String msg, int val) {
 		progressBar.setValue(val);
 		progressStatus.setText(msg);
 	}
 
+	/*
+	 * This function controls the progress of encryption and decryption
+	 */
 	public static void encDec(String msg, int val) {
 		encdecBar.setValue(val);
 		encdecStatus.setText(msg);
 	}
 
+	/*
+	 * This function updates the key list in the download tab
+	 */
 	public void upDateList() {
 		// TODO Auto-generated method stub
 		listModel.removeAllElements();
